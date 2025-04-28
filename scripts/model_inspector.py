@@ -71,7 +71,7 @@ def main(env_folder, urdf_file):
     filename = os.path.normpath(
         os.path.join(
             os.path.dirname(__file__),
-            f"../src/vid2skill/drake_envs/{env_folder}/{urdf_file}.urdf",
+            f"../src/vid2skill/models/{env_folder}/{urdf_file}.urdf",
         )
     )
     model_inspector(meshcat, filename)
