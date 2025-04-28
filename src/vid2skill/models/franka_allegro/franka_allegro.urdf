@@ -625,7 +625,7 @@
         <color rgba="0.2 0.2 0.2 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_palm_link_collision">
       <origin rpy="0 0 0" xyz="-0.009300 0 -0.0475"/>
       <geometry>
         <box size="0.0408 0.1130 0.095"/>
@@ -645,7 +645,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_0_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -679,7 +679,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_1_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -713,7 +713,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_2_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -747,7 +747,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_3_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -783,7 +783,7 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_3_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -807,7 +807,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_4_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -841,7 +841,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_5_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -875,7 +875,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_6_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -909,7 +909,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_7_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -945,7 +945,7 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_7_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -969,7 +969,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_8_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -1003,7 +1003,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_9_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -1037,7 +1037,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_10_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -1071,7 +1071,7 @@
       </geometry>
       <material name="black"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_11_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -1107,7 +1107,7 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_11_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -1134,7 +1134,7 @@
       </material>
       <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_12_collision">
       <geometry>
         <box size="0.0358 0.034 0.0455"/>
       </geometry>
@@ -1170,7 +1170,7 @@
         <color rgba=".2 .2 .2 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_13_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0177"/>
       </geometry>
@@ -1205,7 +1205,7 @@
       <material name="black">
                 </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_14_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0514"/>
       </geometry>
@@ -1240,7 +1240,7 @@
       <material name="black">
                 </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_15_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0423"/>
       </geometry>
@@ -1276,7 +1276,7 @@
         <color rgba=".9 .9 .9 1"/>
       </material>
     </visual>
-    <collision>
+    <collision name="allegro_link_15_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>

@@ -57,21 +57,21 @@ def model_inspector(meshcat: Meshcat, filename: str):
 @click.option(
     "--env_folder",
     type=str,
-    default="sphere_fingertip_with_cube",
+    default="franka_allegro",
     help="The name of the environment folder",
 )
 @click.option(
-    "--urdf_file",
+    "--model_file",
     type=str,
     default="square_frame_planar",
     help="The name of the urdf file",
 )
-def main(env_folder, urdf_file):
+def main(env_folder, model_file):
     meshcat = StartMeshcat()
     filename = os.path.normpath(
         os.path.join(
             os.path.dirname(__file__),
-            f"../src/vid2skill/models/{env_folder}/{urdf_file}.urdf",
+            f"../src/vid2skill/models/{env_folder}/{model_file}",
         )
     )
     model_inspector(meshcat, filename)

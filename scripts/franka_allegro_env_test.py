@@ -14,6 +14,7 @@ def main(cfg: DictConfig):
     env = make_env(cfg)
     env.reset()
     env.render()
+    env.drake_system.get_contact_pairs()
 
     input("Press Enter to start the simulation...")
     for _ in range(1000):

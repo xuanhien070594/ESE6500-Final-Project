@@ -60,7 +60,6 @@ class FrankaAllegroDrakeSystemConfigs(BaseDrakeSystemConfigs):
 
     # for lcs approximation
     contact_geoms: Sequence[Tuple[str, str]] = field(default_factory=lambda: ([]))
-    contact_friction_coeffs: Sequence[float] = field(default_factory=lambda: ([]))
 
     def __post_init__(self):
         # target position and orientation of the object
