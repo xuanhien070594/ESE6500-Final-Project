@@ -48,25 +48,48 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
     def get_contact_pairs(
         self,
     ) -> Tuple[List[Tuple[GeometryId, GeometryId]], List[Tuple[RigidBody, RigidBody]]]:
-        assert hasattr(self, "plant_lcs"), "No plant for LCS approximation was built."
         contact_pairs = []
         body_pairs = []
+        query_port = self.plant.get_geometry_query_input_port()
+        query_object = query_port.Eval(self.plant_context)
+        inspector = query_object.inspector()
         for geom_pair in self.sys_configs.contact_geoms:
-            body_1 = self.plant_lcs.GetBodyByName(
-                geom_pair["link_1"],
-                self.plant_lcs.GetModelInstanceByName(geom_pair["body_1"]),
+            body_1 = self.plant.GetBodyByName(
+                geom_pair["body_1"],
+                self.plant.GetModelInstanceByName(geom_pair["model_1"]),
             )
-            body_2 = self.plant_lcs.GetBodyByName(
-                geom_pair["link_2"],
-                self.plant_lcs.GetModelInstanceByName(geom_pair["body_2"]),
+            body_2 = self.plant.GetBodyByName(
+                geom_pair["body_2"],
+                self.plant.GetModelInstanceByName(geom_pair["model_2"]),
             )
-            geom_1_id = self.plant_lcs.GetCollisionGeometriesForBody(body_1)[0]
-            geom_2_id = self.plant_lcs.GetCollisionGeometriesForBody(body_2)[0]
+            geom_ids_for_body_1 = self.plant.GetCollisionGeometriesForBody(body_1)
+            geom_ids_for_body_2 = self.plant.GetCollisionGeometriesForBody(body_2)
+
+            geom_1_id = None
+            geom_2_id = None
+            for geom_id in geom_ids_for_body_1:
+                if geom_pair["collision_1"] in inspector.GetName(geom_id):
+                    geom_1_id = inspector.GetName(geom_id)
+                    break
+
+            for geom_id in geom_ids_for_body_2:
+                if geom_pair["collision_2"] in inspector.GetName(geom_id):
+                    geom_2_id = inspector.GetName(geom_id)
+                    break
+
+            if geom_1_id is None:
+                raise ValueError(
+                    f"Geometry {geom_pair['collision_1']} not found for body {body_1.name()}"
+                )
+            if geom_2_id is None:
+                raise ValueError(
+                    f"Geometry {geom_pair['collision_2']} not found for body {body_2.name()}"
+                )
+
             contact_pairs.append(
                 (
                     geom_1_id,
                     geom_2_id,
-                    geom_pair["align_tangential_force_basis_to_linear_vel"],
                 )
             )
             body_pairs.append((body_1, body_2))
@@ -74,7 +97,6 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
 
     @property
     def n_contacts_lcs_approx(self):
-        print(self.sys_configs.contact_geoms)
         return len(self.sys_configs.contact_geoms)
 
     def get_default_initial_state(
