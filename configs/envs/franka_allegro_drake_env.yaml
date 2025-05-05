@@ -177,12 +177,12 @@ configs:
   # task related config parameters
   target_pos_obj: [0.0, 0.0, 0.0325]
   target_axisangle_obj: [0.0, 0.0, 1.0, 0.0]  # [axis, angle]
-  init_pos_obj: [0.4, 0.4, 0.0955]
+  init_pos_obj: [0.0, 0.0, 0.0955]
   init_axisangle_obj: [1.0, 0.0, 0.0, -1.5707]  # [axis, angle]
   init_vel_obj: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
   # initial position/velocity of the robot
-  init_qpos_franka: [-0.3, 0.71, 0, -1.97, 1.36, 1.45, 1.74]
+  init_qpos_franka: [-1.7, 0.71, 0, -1.97, 1.36, 1.45, 1.74]
   init_qvel_franka: [0, 0, 0, 0, 0, 0, 0]
 
   # initial position/velocity of the allegro hand
