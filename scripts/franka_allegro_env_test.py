@@ -20,11 +20,12 @@ def main(cfg: DictConfig):
     env = make_env(cfg)
     env.reset()
     env.render()
+    ipdb.set_trace()
 
     for i in range(ref_hand_poses.shape[0]):
         env.drake_system.visualize_ref_hand_pose(ref_hand_poses[i])
         env.drake_system.visualize_ref_obj_pose(ref_obj_poses[i])
-        time.sleep(0.3)
+        time.sleep(0.1)
 
 
 def load_dataset(name, camera_id):
@@ -81,6 +82,7 @@ def load_dataset(name, camera_id):
         hand_pose = data["joint_3d"] @ worldTcamera[:3, :3].T + worldTcamera[:3, 3]
         hand_poses.append(hand_pose)
     obj_poses = np.array(obj_poses)
+    print(obj_poses[0])
     hand_poses = np.concatenate(hand_poses, axis=0)
     return obj_poses, hand_poses
 

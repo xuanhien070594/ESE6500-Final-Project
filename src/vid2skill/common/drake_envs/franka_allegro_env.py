@@ -44,9 +44,28 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
         )
         self.build_diagram()
 
+        self.hand_frames = [
+            "panda_link8",
+            "allegro_link_1",
+            "allegro_link_2",
+            "allegro_link_3",
+            "allegro_link_3_tip",
+            "allegro_link_5",
+            "allegro_link_6",
+            "allegro_link_7",
+            "allegro_link_7_tip",
+            "allegro_link_9",
+            "allegro_link_10",
+            "allegro_link_11",
+            "allegro_link_11_tip",
+            "allegro_link_13",
+            "allegro_link_14",
+            "allegro_link_15",
+            "allegro_link_15_tip",
+        ]
+
     def visualize_ref_obj_pose(self, obj_pose: np.ndarray):
         ref_obj_path = "/ref_obj/"
-        transparency = 0.5
         geom = Mesh(
             "/home/hienbui/git/ESE6500-Final-Project/src/vid2skill/models/ycb/meshes/006_mustard_bottle_textured.gltf",
         )
@@ -54,7 +73,6 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
             self.meshcat.SetObject(
                 ref_obj_path,
                 geom,
-                Rgba(0, 1.0, 0, transparency),
             )
         self.meshcat.SetTransform(
             ref_obj_path,
@@ -64,7 +82,7 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
     def visualize_ref_hand_pose(self, hand_pose: np.ndarray):
         ref_hand_path = "/ref_hand/"
         n_hand_joints = 21
-        transparency = 0.5
+        transparency = 0.2
         wrist_geom = Box(0.03, 0.03, 0.03)
         joint_geom = Box(0.01, 0.01, 0.01)
 

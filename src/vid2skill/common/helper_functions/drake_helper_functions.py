@@ -37,6 +37,9 @@ from vid2skill.common.helper_functions.misc_helper_functions import (
     get_src_folder_absolute_path,
 )
 from vid2skill.common.drake_envs.drake_gym_wrapper import DrakeGymEnv
+from pydrake.visualization._triad import (
+    AddFrameTriadIllustration,
+)
 
 
 # ---------------- Utility functions to create MultibodyPlant from urdf ---------------- #
@@ -297,7 +300,6 @@ def create_plant_from_urdfs(
         visual_visualizer, collision_visualizer = setup_drake_visualizers(
             builder, scene_graph, meshcat, show_collision, visualizer_publish_period
         )
-
     return plant, scene_graph, visual_visualizer, collision_visualizer
 
 
