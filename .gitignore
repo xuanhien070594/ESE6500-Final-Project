@@ -176,3 +176,5 @@ cython_debug/
 
 # hydra stuff
 outputs
+
+snopt*
