@@ -66,6 +66,14 @@ class BaseDrakeSystem:
         self.diagram = self.builder.Build()
         self.diagram_context = self.diagram.CreateDefaultContext()
 
+        self.diagram_ad = self.diagram.ToAutoDiffXd()
+        self.diagram_ad_context = self.diagram_ad.CreateDefaultContext()
+
+        self.plant_ad = self.diagram_ad.GetSubsystemByName("plant")
+        self.plant_ad_context = self.plant_ad.GetMyMutableContextFromRoot(
+            self.diagram_ad_context
+        )
+
         self.sim = Simulator(self.diagram)
         self.sim.Initialize()
         self.sim.set_publish_every_time_step(False)

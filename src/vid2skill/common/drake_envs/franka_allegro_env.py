@@ -44,8 +44,12 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
         )
         self.build_diagram()
 
-        self.hand_frames = [
+        self.hand_body_names = [
             "panda_link8",
+            "allegro_link_13",
+            "allegro_link_14",
+            "allegro_link_15",
+            "allegro_link_15_tip",
             "allegro_link_1",
             "allegro_link_2",
             "allegro_link_3",
@@ -58,11 +62,13 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
             "allegro_link_10",
             "allegro_link_11",
             "allegro_link_11_tip",
-            "allegro_link_13",
-            "allegro_link_14",
-            "allegro_link_15",
-            "allegro_link_15_tip",
         ]
+        self.franka_allegro_model_instance = self.plant.GetModelInstanceByName(
+            "franka_allegro"
+        )
+        self.mustard_bottle_model_instance = self.plant.GetModelInstanceByName(
+            "006_mustard_bottle"
+        )
 
     def visualize_ref_obj_pose(self, obj_pose: np.ndarray):
         ref_obj_path = "/ref_obj/"
@@ -79,31 +85,40 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
             RigidTransform(R=RotationMatrix(obj_pose[:3, :3]), p=obj_pose[:3, 3]),
         )
 
-    def visualize_ref_hand_pose(self, hand_pose: np.ndarray):
-        ref_hand_path = "/ref_hand/"
-        n_hand_joints = 21
+    def visualize_hand_pose(self, hand_pose: np.ndarray, is_human_hand: bool = True):
+        ref_hand_path = "/ref_hand/" if is_human_hand else "/hand/"
+        n_hand_joints = 21 if is_human_hand else 17
         transparency = 0.2
         wrist_geom = Box(0.03, 0.03, 0.03)
         joint_geom = Box(0.01, 0.01, 0.01)
+        color = (
+            Rgba(1.0, 0, 0, transparency)
+            if is_human_hand
+            else Rgba(0, 1.0, 1.0, transparency)
+        )
 
-        fingers = {
-            "thumb_finger_joint_indices": [0, 1, 2, 3, 4],
-            "index_finger_joint_indices": [0, 5, 6, 7, 8],
-            "middle_finger_joint_indices": [0, 9, 10, 11, 12],
-            "ring_finger_joint_indices": [0, 13, 14, 15, 16],
-            "little_finger_joint_indices": [0, 17, 18, 19, 20],
-        }
+        if is_human_hand:
+            fingers = {
+                "thumb_finger_joint_indices": [0, 1, 2, 3, 4],
+                "index_finger_joint_indices": [0, 5, 6, 7, 8],
+                "middle_finger_joint_indices": [0, 9, 10, 11, 12],
+                "ring_finger_joint_indices": [0, 13, 14, 15, 16],
+                "little_finger_joint_indices": [0, 17, 18, 19, 20],
+            }
+        else:
+            fingers = {
+                "thumb_finger_joint_indices": [0, 1, 2, 3, 4],
+                "index_finger_joint_indices": [0, 5, 6, 7, 8],
+                "middle_finger_joint_indices": [0, 9, 10, 11, 12],
+                "little_finger_joint_indices": [0, 13, 14, 15, 16],
+            }
 
         # Draw each joint of the hand as a small cube
         for i in range(n_hand_joints):
             joint_path = f"{ref_hand_path}/joint_{i}"
             if not self.meshcat.HasPath(joint_path):
                 geom = wrist_geom if i == 0 else joint_geom
-                self.meshcat.SetObject(
-                    joint_path,
-                    geom,
-                    Rgba(1.0, 0, 0, transparency),
-                )
+                self.meshcat.SetObject(joint_path, geom, color)
             self.meshcat.SetTransform(
                 joint_path,
                 RigidTransform(
@@ -129,11 +144,7 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
                 # Create a cylinder to represent the bone
                 bone_path = f"{ref_hand_path}/bone_{joint_1_index}_{joint_2_index}"
                 geom = Cylinder(0.003, length)
-                self.meshcat.SetObject(
-                    bone_path,
-                    geom,
-                    Rgba(1.0, 0, 0.0, transparency),
-                )
+                self.meshcat.SetObject(bone_path, geom, color)
                 self.meshcat.SetTransform(
                     bone_path,
                     RigidTransform(
@@ -167,12 +178,12 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
             geom_2_id = None
             for geom_id in geom_ids_for_body_1:
                 if geom_pair["collision_1"] in inspector.GetName(geom_id):
-                    geom_1_id = inspector.GetName(geom_id)
+                    geom_1_id = geom_id
                     break
 
             for geom_id in geom_ids_for_body_2:
                 if geom_pair["collision_2"] in inspector.GetName(geom_id):
-                    geom_2_id = inspector.GetName(geom_id)
+                    geom_2_id = geom_id
                     break
 
             if geom_1_id is None:

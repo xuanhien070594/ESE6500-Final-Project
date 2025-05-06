@@ -623,13 +623,13 @@
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0 "/>
     </visual>
-    <collision>
+    <collision name="allegro_palm_link_collision_1">
       <origin rpy="0 0 0" xyz="-0.009300 -0.02825 -0.0475"/>
       <geometry>
         <box size="0.0408 0.0565 0.095"/>
       </geometry>
     </collision>
-    <collision>
+    <collision name="allegro_palm_link_collision_2">
       <origin rpy="0 0 0" xyz="-0.009300 0.02825 -0.02375"/>
       <geometry>
         <box size="0.0408 0.0565 0.0475"/>
@@ -648,7 +648,7 @@
         <mesh filename="assets/allegro_hand/link_0.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_0_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -681,7 +681,7 @@
         <mesh filename="assets/allegro_hand/link_1.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_1_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -714,7 +714,7 @@
         <mesh filename="assets/allegro_hand/link_2.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_2_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -747,7 +747,7 @@
         <mesh filename="assets/allegro_hand/link_3.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_3_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -780,7 +780,7 @@
         <mesh filename="assets/allegro_hand/link_3.0_tip.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_3_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -803,7 +803,7 @@
         <mesh filename="assets/allegro_hand/link_0.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_4_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -836,7 +836,7 @@
         <mesh filename="assets/allegro_hand/link_1.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_5_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -869,7 +869,7 @@
         <mesh filename="assets/allegro_hand/link_2.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_6_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -902,7 +902,7 @@
         <mesh filename="assets/allegro_hand/link_3.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_7_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -935,7 +935,7 @@
         <mesh filename="assets/allegro_hand/link_3.0_tip.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_7_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -958,7 +958,7 @@
         <mesh filename="assets/allegro_hand/link_0.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_8_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0164"/>
       </geometry>
@@ -991,7 +991,7 @@
         <mesh filename="assets/allegro_hand/link_1.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_9_collision">
       <geometry>
         <box size="0.0196 0.0275 0.054"/>
       </geometry>
@@ -1024,7 +1024,7 @@
         <mesh filename="assets/allegro_hand/link_2.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_10_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0384"/>
       </geometry>
@@ -1057,7 +1057,7 @@
         <mesh filename="assets/allegro_hand/link_3.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_11_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0267"/>
       </geometry>
@@ -1090,7 +1090,7 @@
         <mesh filename="assets/allegro_hand/link_3.0_tip.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_11_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>
@@ -1114,7 +1114,7 @@
       </geometry>
       <origin rpy="0 0 0" xyz="0 0 0"/>
     </visual>
-    <collision>
+    <collision name="allegro_link_12_collision">
       <geometry>
         <box size="0.0358 0.034 0.0455"/>
       </geometry>
@@ -1147,7 +1147,7 @@
         <mesh filename="assets/allegro_hand/link_13.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_13_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0177"/>
       </geometry>
@@ -1180,7 +1180,7 @@
         <mesh filename="assets/allegro_hand/link_14.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_14_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0514"/>
       </geometry>
@@ -1213,7 +1213,7 @@
         <mesh filename="assets/allegro_hand/link_15.0.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_15_collision">
       <geometry>
         <box size="0.0196 0.0275 0.0423"/>
       </geometry>
@@ -1245,7 +1245,7 @@
         <mesh filename="assets/allegro_hand/link_15.0_tip.gltf"/>
       </geometry>
     </visual>
-    <collision>
+    <collision name="allegro_link_15_tip_collision">
       <geometry>
         <sphere radius="0.012"/>
       </geometry>

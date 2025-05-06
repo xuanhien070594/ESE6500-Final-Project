@@ -47,74 +47,74 @@
       case a deviation of 0.0005 m from the visual surface).
      -->
       <collision name="box_collision">
-        <pose>0 0.015 0 0 0 0</pose>
+        <pose>-0.0149 -0.023 0.077 -1.57 0 -0.4</pose>
         <geometry>
           <box>
-            <size>0.090000 0.160300 0.052200</size>
+            <size>0.091 0.1603 0.0522</size>
           </box>
         </geometry>
       </collision>
       <collision name="point_collision1">
-        <pose>0.045500 0.093150 0.026600 0 0 0 </pose>
+        <pose>-0.0671668 -0.02978169 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision2">
-        <pose>0.045500 -0.063150 0.026600 0 0 0 </pose>
+        <pose>-0.04644975 0.01921876 -0.0029 0 0 0</pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision3">
-        <pose>-0.045500 0.093150 0.026600 0 0 0 </pose>
+        <pose>0.0373668 -0.01621831 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision4">
-        <pose>-0.045500 -0.063150 0.026600 0 0 0 </pose>
+        <pose>0.01664975 -0.06521876 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision5">
-        <pose>0.045500 0.093150 -0.026600 0 0 0 </pose>
+        <pose>-0.0671668 -0.02978169 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision6">
-        <pose>0.045500 -0.063150 -0.026600 0 0 0 </pose>
+        <pose>-0.04644975 0.01921876 0.1574 0 0 0</pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision7">
-        <pose>-0.045500 0.093150 -0.026600 0 0 0 </pose>
+        <pose>0.0373668 -0.01621831 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>
       <collision name="point_collision8">
-        <pose>-0.045500 -0.063150 -0.026600 0 0 0 </pose>
+        <pose>0.01664975 -0.06521876 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-7</radius>
+            <radius>1e-3</radius>
           </sphere>
         </geometry>
       </collision>

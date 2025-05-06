@@ -137,12 +137,12 @@ def add_ground_surface(
     if plant.is_finalized():
         raise RuntimeError("Cannot modify a finalized plant by adding ground surface.")
 
-    halfspace_transform = RigidTransform()
+    halfspace_transform = RigidTransform(p=np.array([0, 0, -0.005]))
     friction = CoulombFriction(static_friction_coeff, dynamic_friction_coeff)
     plant.RegisterCollisionGeometry(
         plant.world_body(),
         halfspace_transform,
-        HalfSpace(),
+        Box(10, 10, 0.01),
         name,
         friction,
     )
@@ -288,7 +288,7 @@ def create_plant_from_urdfs(
 
     # perform various operations on the plant
     weld_links(plant, welded_links)
-    add_ground_surface(plant)
+    # add_ground_surface(plant)
     add_joints(plant, joint_specs)
 
     plant.Finalize()
