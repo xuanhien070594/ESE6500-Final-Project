@@ -44,7 +44,7 @@ def main(cfg: DictConfig):
         )
         sol = kinematic_retargeting.solve(prev_sol)
         prev_sol = sol
-        optimized_hand_pose = kinematic_retargeting.forward_kinematics_evaluator(sol)
+        optimized_hand_pose = kinematic_retargeting.optimization.forward_kinematics_evaluator(sol)
         env.drake_system.visualize_hand_pose(optimized_hand_pose, is_human_hand=False)
 
         cur_state = np.concatenate(
