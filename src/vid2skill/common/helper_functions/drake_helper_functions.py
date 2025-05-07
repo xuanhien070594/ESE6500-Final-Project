@@ -1,3 +1,4 @@
+import time
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,8 +13,6 @@ from pydrake.common.eigen_geometry import AngleAxis, Quaternion
 from pydrake.geometry import (
     Box,
     Cylinder,
-    GeometryId,
-    HalfSpace,
     Meshcat,
     MeshcatVisualizer,
     MeshcatVisualizerParams,
@@ -30,15 +29,12 @@ from pydrake.multibody.plant import (
     DiscreteContactApproximation,
     MultibodyPlant,
 )
-from pydrake.solvers import MathematicalProgram, MathematicalProgramResult, Solve
+from pydrake.solvers import MathematicalProgram, MathematicalProgramResult
 from pydrake.systems.framework import DiagramBuilder
 
+from vid2skill.common.drake_envs.drake_gym_wrapper import DrakeGymEnv
 from vid2skill.common.helper_functions.misc_helper_functions import (
     get_src_folder_absolute_path,
-)
-from vid2skill.common.drake_envs.drake_gym_wrapper import DrakeGymEnv
-from pydrake.visualization._triad import (
-    AddFrameTriadIllustration,
 )
 
 
@@ -447,6 +443,29 @@ def draw_frame_axes(
             str_path,
             RigidTransform(quaternion=Quaternion(frame_quat), p=frame_pos),
         )
+
+
+def visualize_traj_with_meshcat(drake_system, x_traj, timestep=0.04):
+    visualizer_context = drake_system.visual_visualizer.GetMyContextFromRoot(
+        drake_system.diagram_context
+    )
+    drake_system.visual_visualizer.StartRecording()
+    traj_length = x_traj.shape[0]
+    for i in range(traj_length):
+        start_time = time.perf_counter()
+        drake_system.diagram_context.SetTime(i * timestep)
+        drake_system.plant.SetPositionsAndVelocities(
+            drake_system.plant_context, x_traj[i]
+        )
+        drake_system.visual_visualizer.ForcedPublish(visualizer_context)
+
+        time_remaining = timestep - (time.perf_counter() - start_time)
+        if time_remaining > 0:
+            time.sleep(time_remaining)
+
+    drake_system.visual_visualizer.StopRecording()
+    animation = drake_system.visual_visualizer.get_mutable_recording()
+    drake_system.meshcat.SetAnimation(animation)
 
 
 # ------------------------------------------------------------------------------------#

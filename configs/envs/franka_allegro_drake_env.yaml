@@ -183,7 +183,7 @@ configs:
   # task related config parameters
   target_pos_obj: [0.0, 0.0, 0.0325]
   target_axisangle_obj: [0.0, 0.0, 1.0, 0.0]  # [axis, angle]
-  init_pos_obj: [0.4283, -0.34489, 0]
+  init_pos_obj: [0.74029686, -0.344702, 0]
   # init_pos_obj: [0, 0, 0]
   init_axisangle_obj: [0.0022758, 0.0215909, -0.9997643, 1.5556855]  # [axis, angle]
   # init_axisangle_obj: [1, 0, 0, 0]  # [axis, angle]
