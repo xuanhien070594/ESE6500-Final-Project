@@ -32,15 +32,39 @@ class KinematicRetargeting:
         )
         self.ref_hand_keypoints_pos = ref_hand_keypoints_pos
 
-        self.contact_pairs, _ = self.drake_system.get_contact_pairs()
+        # because humand hand and allegro hand have different link lengths
+        # we need to scale the distances between the human hand keypoints to match the allegro hand
+        self.scaled_ref_hand_keypoints_pos = self.scaled_human_hand_keypoints_pos()
 
-        self.prog = MathematicalProgram()
-        self.q = self.prog.NewContinuousVariables(self.n_q, "q")
+        self.tracking_cost_weights = [
+            10,
+            1,
+            1,
+            1,
+            10,
+            1,
+            1,
+            1,
+            3,
+            1,
+            1,
+            1,
+            3,
+            1,
+            1,
+            1,
+            3,
+        ]
 
+        self.initialize_optimization_prog()
         self.add_tracking_cost()
         self.add_equality_constraint_for_obj_pose()
         # self.add_no_penetration_constraint()
         self.add_joint_limit_constraints()
+
+    def initialize_optimization_prog(self):
+        self.prog = MathematicalProgram()
+        self.q = self.prog.NewContinuousVariables(self.n_q, "q")
 
         self.solver = SnoptSolver()
         self.solver_options = {
@@ -50,10 +74,6 @@ class KinematicRetargeting:
         }
         for option, value in self.solver_options.items():
             self.prog.SetSolverOption(self.solver.solver_id(), option, value)
-
-        self.scaled_ref_hand_keypoints_pos = self.scaled_human_hand_keypoints_pos()
-
-        self.weights = [10, 1, 1, 1, 10, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1, 1, 3]
 
     def scaled_human_hand_keypoints_pos(self):
         cur_q = self.drake_system.plant.GetPositions(self.drake_system.plant_context)
@@ -159,7 +179,7 @@ class KinematicRetargeting:
             tracking_error = (
                 cur_hand_keypoints_pos[i] - self.scaled_ref_hand_keypoints_pos[i]
             )
-            cost += self.weights[i] * tracking_error.T @ tracking_error
+            cost += self.tracking_cost_weights[i] * tracking_error.T @ tracking_error
         return cost
 
     def add_tracking_cost(self):
