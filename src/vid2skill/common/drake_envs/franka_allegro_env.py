@@ -9,7 +9,13 @@ from pydrake.geometry import Box, Cylinder, GeometryId, Rgba, Sphere, Mesh
 from pydrake.math import RigidTransform, RotationMatrix
 from pydrake.multibody.tree import RigidBody
 from pydrake.systems.framework import LeafSystem
-from pydrake.systems.primitives import PassThrough, ConstantVectorSource
+from pydrake.systems.primitives import (
+    PassThrough,
+    ConstantVectorSource,
+    Adder,
+    Demultiplexer,
+)
+from pydrake.systems.controllers import InverseDynamics
 from scipy.spatial.transform import Rotation
 
 from vid2skill.common.helper_functions.drake_helper_functions import (
@@ -28,8 +34,24 @@ class FrankaAllegroDrakeSystem(BaseDrakeSystem):
         )
         fake_reward_source = self.builder.AddSystem(ConstantVectorSource(np.zeros(1)))
 
+        # Gravity compensation
+        inverse_dynamics = self.builder.AddSystem(
+            InverseDynamics(self.plant, InverseDynamics.kGravityCompensation)
+        )
+        demux = self.builder.AddSystem(Demultiplexer([self.action_size, 6]))
+        action_adder = self.builder.AddSystem(Adder(2, self.action_size))
         self.builder.Connect(
-            desired_action_source.get_output_port(),
+            self.plant.get_state_output_port(), inverse_dynamics.get_input_port(0)
+        )
+        self.builder.Connect(
+            inverse_dynamics.get_output_port(), demux.get_input_port(0)
+        )
+        self.builder.Connect(demux.get_output_port(0), action_adder.get_input_port(0))
+        self.builder.Connect(
+            desired_action_source.get_output_port(), action_adder.get_input_port(1)
+        )
+        self.builder.Connect(
+            action_adder.get_output_port(),
             self.plant.get_actuation_input_port(),
         )
 

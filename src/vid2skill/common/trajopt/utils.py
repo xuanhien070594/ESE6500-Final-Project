@@ -34,7 +34,7 @@ def load_dataset(name, camera_id):
             [0, 0, 1],
         ]
     )
-    offset[:3, 3] = np.array([1.0, -0.8, 0.0])
+    offset[:3, 3] = np.array([1.0, -0.8, 0.21])
     worldTcamera = offset @ worldTcamera
 
     obj_poses = []

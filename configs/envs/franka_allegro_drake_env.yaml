@@ -4,7 +4,7 @@ configs:
   _target_: vid2skill.common.config_classes.env_configs.FrankaAllegroDrakeSystemConfigs
   state_size: 59
   action_size: 23
-  frame_skip: 20
+  frame_skip: 40
   sim_dt: 0.001
   show_collision_geometries: false
   package_map:
@@ -13,10 +13,15 @@ configs:
   urdfs:
     - "vid2skill/models/franka_allegro/franka_allegro.urdf"
     - "vid2skill/models/ycb/006_mustard_bottle.sdf"
+    - "vid2skill/models/franka_allegro/table.sdf"
 
   welded_links:
     - body_of_child_link: "franka_allegro"
       child_link: "panda_link0"
+      body_of_parent_link: "WorldModelInstance"
+      parent_link: "world"
+    - body_of_child_link: "table"
+      child_link: "table"
       body_of_parent_link: "WorldModelInstance"
       parent_link: "world"
 
@@ -183,9 +188,10 @@ configs:
   # task related config parameters
   target_pos_obj: [0.0, 0.0, 0.0325]
   target_axisangle_obj: [0.0, 0.0, 1.0, 0.0]  # [axis, angle]
-  init_pos_obj: [0.74029686, -0.344702, 0]
+  init_pos_obj: [0.74029686, -0.344702, 0.2]
   # init_pos_obj: [0, 0, 0]
   init_axisangle_obj: [0.0022758, 0.0215909, -0.9997643, 1.5556855]  # [axis, angle]
+  # init_axisangle_obj: [0, 0, -1.0, 1.5707]  # [axis, angle]
   # init_axisangle_obj: [1, 0, 0, 0]  # [axis, angle]
   init_vel_obj: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 

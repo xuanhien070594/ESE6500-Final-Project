@@ -284,7 +284,7 @@ def create_plant_from_urdfs(
 
     # perform various operations on the plant
     weld_links(plant, welded_links)
-    # add_ground_surface(plant)
+    add_ground_surface(plant)
     add_joints(plant, joint_specs)
 
     plant.Finalize()

@@ -17,6 +17,7 @@
   -->
     <link name="base_link_mustard">
       <inertial>
+        <pose>-0.0149 -0.023 0.077 -1.57 0 -0.4</pose>
         <mass>0.603000</mass>
         <inertia>
           <ixx>0.002009</ixx>
@@ -54,11 +55,11 @@
           </box>
         </geometry>
       </collision>
-      <collision name="point_collision1">
+      <!-- <collision name="point_collision1">
         <pose>-0.0671668 -0.02978169 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -66,7 +67,7 @@
         <pose>-0.04644975 0.01921876 -0.0029 0 0 0</pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -74,7 +75,7 @@
         <pose>0.0373668 -0.01621831 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -82,7 +83,7 @@
         <pose>0.01664975 -0.06521876 -0.0029 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -90,7 +91,7 @@
         <pose>-0.0671668 -0.02978169 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -98,7 +99,7 @@
         <pose>-0.04644975 0.01921876 0.1574 0 0 0</pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -106,7 +107,7 @@
         <pose>0.0373668 -0.01621831 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
       </collision>
@@ -114,10 +115,10 @@
         <pose>0.01664975 -0.06521876 0.1574 0 0 0 </pose>
         <geometry>
           <sphere>
-            <radius>1e-3</radius>
+            <radius>1e-2</radius>
           </sphere>
         </geometry>
-      </collision>
+      </collision> -->
     </link>
   </model>
 </sdf>
