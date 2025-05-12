@@ -6,9 +6,12 @@ import hydra
 import numpy as np
 from omegaconf import DictConfig
 
-from vid2skill.common.trajopt.traj_opt import TrajectoryOptimizer
+from vid2skill.common.trajopt.traj_opt_zero_order import (
+    TrajectoryOptimizerCEM,
+    TrajectoryOptimizerCMAES,
+)
 from vid2skill.common.trajopt.utils import load_dataset
-from kinematic_retargeting_test import setup_environment, visualize_traj_with_meshcat
+from kinematic_retargeting_test import setup_environments, visualize_traj_with_meshcat
 
 
 @hydra.main(
@@ -27,10 +30,10 @@ def main(cfg: DictConfig):
     x_traj = np.load(kinematic_feasible_traj_path)
 
     # Create environment and visualize loaded kinematically feasible trajectory
-    env, _ = setup_environment(cfg)
+    env, _ = setup_environments(cfg)
     # visualize_traj_with_meshcat(env.drake_system, x_traj)
 
-    traj_optimizer = TrajectoryOptimizer(env, x_traj)
+    traj_optimizer = TrajectoryOptimizerCMAES(env, x_traj)
     dynamically_feasbible_x_traj = traj_optimizer.optimize()
 
 

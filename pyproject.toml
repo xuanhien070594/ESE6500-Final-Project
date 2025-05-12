@@ -7,6 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "black>=25.1.0",
     "click>=8.1.8",
+    "cmaes>=0.11.1",
     "dill>=0.4.0",
     "drake>=1.40.0",
     "gymnasium>=1.1.1",
@@ -14,4 +15,5 @@ dependencies = [
     "ipdb>=0.13.13",
     "loguru>=0.7.3",
     "scipy>=1.15.2",
+    "tqdm>=4.67.1",
 ]
