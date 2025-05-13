@@ -1,12 +1,18 @@
+import gc
+import multiprocessing as mp
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 import cmaes
 import numpy as np
 from loguru import logger
 from scipy.interpolate import interp1d
 from tqdm import tqdm
+
+from vid2skill.common.helper_functions.drake_helper_functions import (
+    visualize_traj_with_meshcat,
+)
 
 
 @dataclass
@@ -19,6 +25,7 @@ class CEMConfig:
     smoothing_factor: float = 0.8  # Smoothing factor for mean and covariance updates
     initial_std: float = 0.05  # Initial standard deviation for sampling
     convergence_threshold: float = 1e-4  # Threshold for convergence
+    n_workers: int = 10  # Number of workers for parallel execution
 
 
 @dataclass
@@ -27,9 +34,10 @@ class CMAESConfig:
 
     n_iterations: int = 50
     population_size: int = 60
-    sigma: float = 0.1
+    sigma: float = 0.3
     lower_bound: float = -1
     upper_bound: float = 1
+    n_workers: int = 10  # Number of workers for parallel execution
 
 
 @dataclass
@@ -46,7 +54,8 @@ class TrajectoryOptimizerBase(ABC):
 
     def __init__(
         self,
-        env,
+        create_env_w_visualizer_fn: Callable,
+        create_env_wo_visualizer_fn: Callable,
         ref_trajectory: np.ndarray,
         cost_weights: Optional[TrajOptCostWeights] = None,
     ):
@@ -58,20 +67,18 @@ class TrajectoryOptimizerBase(ABC):
             ref_trajectory: Reference trajectory to track (shape: n_steps x state_dim)
             cost_weights: Cost weights for the trajectory optimization
         """
-        self.env = env
-        # self.n_steps = ref_trajectory.shape[0]
+        self.create_env_w_visualizer_fn = create_env_w_visualizer_fn
+        self.create_env_wo_visualizer_fn = create_env_wo_visualizer_fn
         self.subsample_interval = 10
         self.ref_trajectory = ref_trajectory
         self.n_steps = self.ref_trajectory.shape[0] // self.subsample_interval + 1
         self.full_n_steps = (self.n_steps - 1) * self.subsample_interval + 1
         self.cost_weights = cost_weights or TrajOptCostWeights()
 
-        # Get state and control dimensions
-        self.state_dim = env.drake_system.plant.num_multibody_states()
-        self.control_dim = env.drake_system.plant.num_actuated_dofs()
+        self.control_dim = 23
 
         # Input scales
-        self.control_scales = np.concatenate([[10, 10, 10, 10, 5, 5, 5], [0.5] * 16])
+        self.control_scales = np.concatenate([[3, 3, 3, 3, 1, 1, 1], [0.2] * 16])
 
     def compute_cost(self, trajectory: np.ndarray, control_inputs: np.ndarray) -> float:
         """
@@ -137,27 +144,48 @@ class TrajectoryOptimizerBase(ABC):
             interpolated_controls[:, i] = f(full_timesteps)
         return interpolated_controls
 
-    def rollout(self, controls: np.ndarray) -> np.ndarray:
+    def rollout(self, env, controls: np.ndarray) -> np.ndarray:
         """
         Simulate the system forward using the given controls.
 
         Args:
+            env: Environment for simulation
             controls: Control sequence (shape: n_steps x control_dim)
 
         Returns:
             np.ndarray: Resulting state trajectory
         """
+        state_dim = env.drake_system.plant.num_multibody_states()
+
+        # Since CMA-ES returns normalized controls between -1 and 1, we need to rescale them
+        # to the actual control scales
         rescaled_controls = controls * self.control_scales
+
+        # Interpolate the controls to the full trajectory length
         interpolated_controls = self.interpolate_controls(rescaled_controls)
-        trajectory = np.zeros((self.full_n_steps, self.state_dim))
-        next_obs, _ = self.env.reset(specified_initial_state=self.ref_trajectory[0])
+
+        # Simulate the system forward
+        trajectory = np.zeros((self.full_n_steps, state_dim))
+        next_obs, _ = env.reset(specified_initial_state=self.ref_trajectory[0])
 
         for t in range(self.full_n_steps):
             trajectory[t] = next_obs
-            next_obs, _, _, _, _ = self.env.step(interpolated_controls[t])
-            self.env.render()
+            next_obs, _, _, _, _ = env.step(interpolated_controls[t])
 
         return trajectory, interpolated_controls
+
+    def worker_to_execute_and_eval_rollout(self, controls) -> float:
+        """
+        Execute the rollout and evaluate the cost.
+
+        Args:
+            controls: Flattened control sequence (shape: n_steps * control_dim)
+        """
+        env = self.create_env_wo_visualizer_fn()
+        controls = controls.reshape(self.n_steps, self.control_dim)
+        rollout, interpolated_controls = self.rollout(env, controls)
+        cost = self.compute_cost(rollout, interpolated_controls)
+        return cost
 
     @abstractmethod
     def optimize(self) -> Tuple[np.ndarray, float]:
@@ -175,12 +203,18 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
 
     def __init__(
         self,
-        env,
+        create_env_w_visualizer_fn: Callable,
+        create_env_wo_visualizer_fn: Callable,
         ref_trajectory: np.ndarray,
         config: Optional[CEMConfig] = None,
         cost_weights: Optional[TrajOptCostWeights] = None,
     ):
-        super().__init__(env, ref_trajectory, cost_weights)
+        super().__init__(
+            create_env_w_visualizer_fn,
+            create_env_wo_visualizer_fn,
+            ref_trajectory,
+            cost_weights,
+        )
         self.config = config or CEMConfig()
 
         # Initialize mean and covariance for CEM
@@ -254,12 +288,18 @@ class TrajectoryOptimizerCMAES(TrajectoryOptimizerBase):
 
     def __init__(
         self,
-        env,
+        create_env_w_visualizer_fn: Callable,
+        create_env_wo_visualizer_fn: Callable,
         ref_trajectory: np.ndarray,
         config: Optional[CMAESConfig] = None,
         cost_weights: Optional[TrajOptCostWeights] = None,
     ):
-        super().__init__(env, ref_trajectory, cost_weights)
+        super().__init__(
+            create_env_w_visualizer_fn,
+            create_env_wo_visualizer_fn,
+            ref_trajectory,
+            cost_weights,
+        )
         self.config = config or CMAESConfig()
         self.cmaes_solver = cmaes.CMA(
             mean=np.zeros(self.n_steps * self.control_dim),
@@ -283,24 +323,45 @@ class TrajectoryOptimizerCMAES(TrajectoryOptimizerBase):
         for iteration in tqdm(
             range(self.config.n_iterations), desc="CMA-ES Optimization"
         ):
-            solutions = []
-            for _ in tqdm(
-                range(self.cmaes_solver.population_size),
-                desc="Evaluating population",
-                leave=False,
-            ):
-                flatten_u_traj = self.cmaes_solver.ask()
-                u_traj = flatten_u_traj.reshape(self.n_steps, self.control_dim)
-                rollout, interpolated_u_traj = self.rollout(u_traj)
-                loss = self.compute_cost(rollout, interpolated_u_traj)
-                solutions.append((flatten_u_traj, loss))
+            # Get all solutions for this iteration
+            samples = [
+                self.cmaes_solver.ask()
+                for _ in range(self.cmaes_solver.population_size)
+            ]
+
+            # Evaluate solutions in parallel using pool.starmap
+            with mp.Pool(processes=self.config.n_workers) as pool:
+                results = pool.starmap(
+                    self.worker_to_execute_and_eval_rollout,
+                    [(sample,) for sample in samples],
+                )
+
+            # Extract costs from results
+            solutions = [
+                (sample, cost.item()) for sample, cost in zip(samples, results)
+            ]
+
+            # Tell results to CMA-ES solver
             self.cmaes_solver.tell(solutions)
 
             # Evaluate and log the cost of the mean solution
-            mean_u_traj = self.cmaes_solver.mean.reshape(self.n_steps, self.control_dim)
-            mean_rollout, mean_interpolated_u_traj = self.rollout(mean_u_traj)
-            mean_cost = self.compute_cost(mean_rollout, mean_interpolated_u_traj)
-            logger.info(f"Iteration {iteration}: Mean solution cost = {mean_cost:.4f}")
+            try:
+                eval_env = self.create_env_w_visualizer_fn()
+                mean_u_traj = self.cmaes_solver.mean.reshape(
+                    self.n_steps, self.control_dim
+                )
+                mean_rollout, mean_interpolated_u_traj = self.rollout(
+                    eval_env, mean_u_traj
+                )
+                mean_cost = self.compute_cost(mean_rollout, mean_interpolated_u_traj)
+                visualize_traj_with_meshcat(eval_env.drake_system, mean_rollout)
+                logger.info(
+                    f"Iteration {iteration}: Mean solution cost = {mean_cost:.4f}"
+                )
+                input("Press Enter to continue...")
+            finally:
+                del eval_env
+                gc.collect()
 
             if self.cmaes_solver.should_stop():
                 break

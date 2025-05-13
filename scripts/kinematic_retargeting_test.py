@@ -51,9 +51,8 @@ def setup_environment(cfg: DictConfig) -> Tuple[object, np.ndarray]:
         Tuple containing environment object and initial state
     """
     env = make_env(cfg)
-    cur_state, _ = env.reset()
-    env.render()
-    return env, cur_state
+    env.reset()
+    return env
 
 
 def perform_kinematic_retargeting(
@@ -152,7 +151,7 @@ def main(cfg: DictConfig):
     )
 
     # Setup environment
-    env, _ = setup_environment(cfg)
+    env = setup_environment(cfg)
 
     # Generate trajectory
     x_traj = generate_trajectory(

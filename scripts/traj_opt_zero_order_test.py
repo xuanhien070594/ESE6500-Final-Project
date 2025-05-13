@@ -2,6 +2,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple
 
+import copy
 import hydra
 import numpy as np
 from omegaconf import DictConfig
@@ -11,7 +12,8 @@ from vid2skill.common.trajopt.traj_opt_zero_order import (
     TrajectoryOptimizerCMAES,
 )
 from vid2skill.common.trajopt.utils import load_dataset
-from kinematic_retargeting_test import setup_environments, visualize_traj_with_meshcat
+from kinematic_retargeting_test import setup_environment
+from functools import partial
 
 
 @hydra.main(
@@ -28,12 +30,15 @@ def main(cfg: DictConfig):
         / f"data/traj_opt/kinematic_feasible_trajs/{timestamp}/{file_name}"
     )
     x_traj = np.load(kinematic_feasible_traj_path)
+    create_env_w_visualizer_fn = partial(setup_environment, cfg)
 
-    # Create environment and visualize loaded kinematically feasible trajectory
-    env, _ = setup_environments(cfg)
-    # visualize_traj_with_meshcat(env.drake_system, x_traj)
+    cfg_wo_visualizer = copy.deepcopy(cfg)
+    cfg_wo_visualizer.configs.enable_visualizer = False
+    create_env_wo_visualizer_fn = partial(setup_environment, cfg_wo_visualizer)
 
-    traj_optimizer = TrajectoryOptimizerCMAES(env, x_traj)
+    traj_optimizer = TrajectoryOptimizerCMAES(
+        create_env_w_visualizer_fn, create_env_wo_visualizer_fn, x_traj
+    )
     dynamically_feasbible_x_traj = traj_optimizer.optimize()
 
 

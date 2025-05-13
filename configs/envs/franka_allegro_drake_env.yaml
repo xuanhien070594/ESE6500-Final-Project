@@ -7,6 +7,7 @@ configs:
   frame_skip: 40
   sim_dt: 0.001
   show_collision_geometries: false
+  enable_visualizer: true
   package_map:
     trifinger: "lcs_rl/drake_envs/trifinger_with_cube"
 

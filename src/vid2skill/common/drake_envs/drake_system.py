@@ -33,7 +33,11 @@ class BaseDrakeSystem:
         self.builder = DiagramBuilder()
 
         # shared Meshcat instance for all visualizers
-        self.meshcat = initialize_meshcat()
+        if self.sys_configs.enable_visualizer:
+            self.meshcat = initialize_meshcat()
+        else:
+            self.meshcat = None
+
         (
             self.plant,
             self.scene_graph,

@@ -17,7 +17,7 @@ class BaseDrakeSystemConfigs:
     frame_skip: int = 1
     sim_dt: float = 0.002
     show_collision_geometries: bool = False
-    enable_contact_visualizer: bool = False
+    enable_visualizer: bool = True
 
     package_map: Dict[str, str] = field(default=dict)
     urdfs: List[str] = field(default=list)
