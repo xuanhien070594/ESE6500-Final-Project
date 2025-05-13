@@ -1,6 +1,17 @@
 import numpy as np
 from pathlib import Path
 import yaml
+import random
+
+
+def set_random_seed(seed: int) -> None:
+    """Set random seeds for reproducibility.
+
+    Args:
+        seed (int): The seed value to use for random number generation.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
 
 
 def load_dataset(name, camera_id):

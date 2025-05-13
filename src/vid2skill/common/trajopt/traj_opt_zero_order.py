@@ -19,11 +19,11 @@ from vid2skill.common.helper_functions.drake_helper_functions import (
 class CEMConfig:
     """Configuration for Cross-Entropy Method."""
 
-    n_samples: int = 50  # Number of samples per iteration
-    n_elite: int = 5  # Number of elite samples to keep
+    n_samples: int = 100  # Number of samples per iteration
+    n_elite: int = 10  # Number of elite samples to keep
     n_iterations: int = 50  # Maximum number of iterations
-    smoothing_factor: float = 0.8  # Smoothing factor for mean and covariance updates
-    initial_std: float = 0.05  # Initial standard deviation for sampling
+    smoothing_factor: float = 0.5  # Smoothing factor for mean and covariance updates
+    initial_std: float = 0.3  # Initial standard deviation for sampling
     convergence_threshold: float = 1e-4  # Threshold for convergence
     n_workers: int = 10  # Number of workers for parallel execution
 
@@ -78,7 +78,7 @@ class TrajectoryOptimizerBase(ABC):
         self.control_dim = 23
 
         # Input scales
-        self.control_scales = np.concatenate([[3, 3, 3, 3, 1, 1, 1], [0.2] * 16])
+        self.control_scales = np.concatenate([[5, 5, 5, 5, 2, 2, 2], [0.2] * 16])
 
     def compute_cost(self, trajectory: np.ndarray, control_inputs: np.ndarray) -> float:
         """
@@ -218,42 +218,33 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
         self.config = config or CEMConfig()
 
         # Initialize mean and covariance for CEM
-        self.mean = np.zeros((self.n_steps, self.control_dim))
-        self.cov = np.eye(self.control_dim) * self.config.initial_std
+        self.mean = np.zeros(self.n_steps * self.control_dim)
+        self.cov = np.eye(self.n_steps * self.control_dim) * self.config.initial_std
 
     def optimize(self) -> Tuple[np.ndarray, float]:
         """
         Optimize the trajectory using Cross-Entropy Method.
 
         Returns:
-            Tuple[np.ndarray, float]: Best trajectory and its cost
+            Tuple[np.ndarray, float]: Mean trajectory and its cost
         """
-        best_cost = float("inf")
-        best_trajectory = None
+        prev_mean_cost = float("inf")
 
-        for iteration in range(self.config.n_iterations):
+        for iteration in tqdm(range(self.config.n_iterations), desc="CEM Optimization"):
             logger.info(f"Iteration {iteration} of {self.config.n_iterations}")
             samples = np.random.multivariate_normal(
                 self.mean.reshape(-1),
-                np.kron(np.eye(self.n_steps), self.cov),
+                self.cov,
                 size=self.config.n_samples,
-            ).reshape(self.config.n_samples, self.n_steps, self.control_dim)
+            )
             samples = np.clip(samples, -1, 1)
 
-            # Evaluate samples
-            costs = []
-            trajectories = []
-
-            for i, sample in enumerate(samples):
-                trajectory = self.rollout(sample)
-                cost = self.compute_cost(trajectory, sample)
-                costs.append(cost)
-                trajectories.append(trajectory)
-
-                if cost < best_cost:
-                    best_cost = cost
-                    best_trajectory = trajectory
-                logger.info(f"Evaluating sample {i}, cost: {cost}")
+            # Evaluate samples in parallel
+            with mp.Pool(processes=self.config.n_workers) as pool:
+                costs = pool.map(
+                    self.worker_to_execute_and_eval_rollout,
+                    [sample.reshape(-1) for sample in samples],
+                )
 
             # Sort samples by cost
             sorted_indices = np.argsort(costs)
@@ -261,26 +252,44 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
 
             # Update mean and covariance
             new_mean = np.mean(elite_samples, axis=0)
-            new_cov = np.cov(elite_samples.reshape(-1, self.control_dim).T)
+            new_cov = np.cov(elite_samples.T)
 
             # Smooth updates
-            self.mean = (
-                1 - self.config.smoothing_factor
-            ) * self.mean + self.config.smoothing_factor * new_mean
+            self.mean = (1 - self.config.smoothing_factor) * self.mean.reshape(
+                -1
+            ) + self.config.smoothing_factor * new_mean
             self.cov = (
                 1 - self.config.smoothing_factor
             ) * self.cov + self.config.smoothing_factor * new_cov
 
+            # Evaluate the mean trajectory
+            if iteration % 10 == 0:
+                eval_env = self.create_env_w_visualizer_fn()
+            else:
+                eval_env = self.create_env_wo_visualizer_fn()
+            mean_trajectory, interpolated_controls = self.rollout(
+                eval_env, self.mean.reshape(self.n_steps, self.control_dim)
+            )
+            mean_cost = self.compute_cost(mean_trajectory, interpolated_controls)
+            logger.info(f"Iteration {iteration}: Mean solution cost = {mean_cost:.4f}")
+
+            if eval_env.drake_system.meshcat is not None:
+                visualize_traj_with_meshcat(eval_env.drake_system, mean_trajectory)
+                input("Press Enter to continue...")
+                # Prevent destructor of meshcat from being called in non-main thread
+                del eval_env
+                gc.collect()
+
             # Check convergence
             if (
                 iteration > 0
-                and abs(best_cost - prev_best_cost) < self.config.convergence_threshold
+                and abs(mean_cost - prev_mean_cost) < self.config.convergence_threshold
             ):
                 break
 
-            prev_best_cost = best_cost
+            prev_mean_cost = mean_cost
 
-        return best_trajectory, best_cost
+        return mean_trajectory, mean_cost
 
 
 class TrajectoryOptimizerCMAES(TrajectoryOptimizerBase):

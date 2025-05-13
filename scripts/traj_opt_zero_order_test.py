@@ -11,7 +11,7 @@ from vid2skill.common.trajopt.traj_opt_zero_order import (
     TrajectoryOptimizerCEM,
     TrajectoryOptimizerCMAES,
 )
-from vid2skill.common.trajopt.utils import load_dataset
+from vid2skill.common.trajopt.utils import set_random_seed
 from kinematic_retargeting_test import setup_environment
 from functools import partial
 
@@ -30,13 +30,18 @@ def main(cfg: DictConfig):
         / f"data/traj_opt/kinematic_feasible_trajs/{timestamp}/{file_name}"
     )
     x_traj = np.load(kinematic_feasible_traj_path)
-    create_env_w_visualizer_fn = partial(setup_environment, cfg)
 
+    # Set random seed
+    set_random_seed(0)
+
+    # Create functions to create environments with and without visualizer
+    create_env_w_visualizer_fn = partial(setup_environment, cfg)
     cfg_wo_visualizer = copy.deepcopy(cfg)
     cfg_wo_visualizer.configs.enable_visualizer = False
     create_env_wo_visualizer_fn = partial(setup_environment, cfg_wo_visualizer)
 
-    traj_optimizer = TrajectoryOptimizerCMAES(
+    # Create trajectory optimizer
+    traj_optimizer = TrajectoryOptimizerCEM(
         create_env_w_visualizer_fn, create_env_wo_visualizer_fn, x_traj
     )
     dynamically_feasbible_x_traj = traj_optimizer.optimize()
