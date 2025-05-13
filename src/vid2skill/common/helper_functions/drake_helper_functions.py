@@ -503,6 +503,21 @@ def make_env(cfg: DictConfig):
     )
 
 
+def setup_environment(cfg: DictConfig) -> Tuple[object, np.ndarray]:
+    """
+    Initialize the environment and get initial state.
+
+    Args:
+        cfg: Configuration dictionary
+
+    Returns:
+        Tuple containing environment object and initial state
+    """
+    env = make_env(cfg)
+    env.reset()
+    return env
+
+
 # ------------------------------------------------------------------------------------#
 
 

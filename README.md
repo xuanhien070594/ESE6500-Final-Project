@@ -17,6 +17,12 @@ uv pip install -e .
 
 To run the Franka Allegro environment test:
 ```bash
+uv run python scripts/drake_env_test.py
+```
+
+## Running Kinematic Motion Retargeting
+
+```bash
 uv run python scripts/kinematic_retargeting_test.py
 ```
 

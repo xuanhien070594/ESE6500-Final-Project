@@ -19,9 +19,9 @@ from vid2skill.common.helper_functions.drake_helper_functions import (
 class CEMConfig:
     """Configuration for Cross-Entropy Method."""
 
-    n_samples: int = 100  # Number of samples per iteration
-    n_elite: int = 10  # Number of elite samples to keep
-    n_iterations: int = 50  # Maximum number of iterations
+    n_samples: int = 50  # Number of samples per iteration
+    n_elite: int = 5  # Number of elite samples to keep
+    n_iterations: int = 200  # Maximum number of iterations
     smoothing_factor: float = 0.5  # Smoothing factor for mean and covariance updates
     initial_std: float = 0.3  # Initial standard deviation for sampling
     convergence_threshold: float = 1e-4  # Threshold for convergence
@@ -47,6 +47,7 @@ class TrajOptCostWeights:
     w_object_pose_tracking: float = 10
     w_franka_input_penalty: float = 0
     w_allegro_input_penalty: float = 0
+    w_bounds_violation_penalty: float = 1000.0
 
 
 class TrajectoryOptimizerBase(ABC):
@@ -69,9 +70,9 @@ class TrajectoryOptimizerBase(ABC):
         """
         self.create_env_w_visualizer_fn = create_env_w_visualizer_fn
         self.create_env_wo_visualizer_fn = create_env_wo_visualizer_fn
-        self.subsample_interval = 10
+        self.subsample_interval = 2
         self.ref_trajectory = ref_trajectory
-        self.n_steps = self.ref_trajectory.shape[0] // self.subsample_interval + 1
+        self.n_steps = (self.ref_trajectory.shape[0] - 1) // self.subsample_interval + 1
         self.full_n_steps = (self.n_steps - 1) * self.subsample_interval + 1
         self.cost_weights = cost_weights or TrajOptCostWeights()
 
@@ -93,7 +94,20 @@ class TrajectoryOptimizerBase(ABC):
         """
         cost = 0
 
+        # Define state bounds parameters
+        state_margin = 0.2  # margin in radians
+
         for i in range(self.full_n_steps):
+            # Compute bounds for current timestep
+            state_lower_bounds = self.ref_trajectory[i, :23] - state_margin
+            state_upper_bounds = self.ref_trajectory[i, :23] + state_margin
+
+            # Add bounds violation penalty
+            state_violations = np.maximum(
+                0, state_lower_bounds - trajectory[i, :23]
+            ) + np.maximum(0, trajectory[i, :23] - state_upper_bounds)
+            bounds_cost = np.sum(state_violations)
+
             franka_joint_pos_tracking_cost = (
                 np.linalg.norm(trajectory[i, :7] - self.ref_trajectory[i, :7]) ** 2
             )
@@ -110,6 +124,7 @@ class TrajectoryOptimizerBase(ABC):
                 + self.cost_weights.w_allegro_joint_pos_tracking
                 * allegro_joint_pos_tracking_cost
                 + self.cost_weights.w_object_pose_tracking * object_pos_tracking_cost
+                + self.cost_weights.w_bounds_violation_penalty * bounds_cost
             )
 
             if i == self.n_steps - 1:
@@ -263,7 +278,7 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
             ) * self.cov + self.config.smoothing_factor * new_cov
 
             # Evaluate the mean trajectory
-            if iteration % 10 == 0:
+            if iteration % 50 == 0:
                 eval_env = self.create_env_w_visualizer_fn()
             else:
                 eval_env = self.create_env_wo_visualizer_fn()
@@ -280,12 +295,12 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
                 del eval_env
                 gc.collect()
 
-            # Check convergence
-            if (
-                iteration > 0
-                and abs(mean_cost - prev_mean_cost) < self.config.convergence_threshold
-            ):
-                break
+            # # Check convergence
+            # if (
+            #     iteration > 0
+            #     and abs(mean_cost - prev_mean_cost) < self.config.convergence_threshold
+            # ):
+            #     break
 
             prev_mean_cost = mean_cost
 

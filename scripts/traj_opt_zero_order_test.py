@@ -1,19 +1,19 @@
+import copy
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 from typing import List, Tuple
 
-import copy
 import hydra
 import numpy as np
 from omegaconf import DictConfig
 
+from vid2skill.common.helper_functions.drake_helper_functions import setup_environment
+from vid2skill.common.helper_functions.misc_helper_functions import set_random_seed
 from vid2skill.common.trajopt.traj_opt_zero_order import (
     TrajectoryOptimizerCEM,
     TrajectoryOptimizerCMAES,
 )
-from vid2skill.common.trajopt.utils import set_random_seed
-from kinematic_retargeting_test import setup_environment
-from functools import partial
 
 
 @hydra.main(

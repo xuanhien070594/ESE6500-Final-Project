@@ -1,9 +1,11 @@
 """This module contains miscellaneous helper functions that don't fit into any other category."""
 
+import random
 from pathlib import Path
 from typing import Any, Union
 
 import dill
+import numpy as np
 
 
 def create_folder_if_not_exists(folder_path: Path) -> None:
@@ -97,3 +99,13 @@ def resolve_absolute_path(relative_path_to_cur_file: Union[Path, str]) -> Path:
         pathlib.Path: The absolute path corresponding to the given relative path.
     """
     return (Path(__file__).parent / relative_path_to_cur_file).resolve()
+
+
+def set_random_seed(seed: int) -> None:
+    """Set random seeds for reproducibility.
+
+    Args:
+        seed (int): The seed value to use for random number generation.
+    """
+    random.seed(seed)
+    np.random.seed(seed)

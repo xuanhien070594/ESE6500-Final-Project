@@ -7,7 +7,7 @@ import numpy as np
 from omegaconf import DictConfig
 
 from vid2skill.common.helper_functions.drake_helper_functions import (
-    make_env,
+    setup_environment,
     visualize_traj_with_meshcat,
 )
 from vid2skill.common.trajopt.kinematic_retargeting import KinematicRetargeting
@@ -38,21 +38,6 @@ def load_and_preprocess_dataset(
         [ref_hand_keypoints_traj[:, :-8, :], ref_hand_keypoints_traj[:, -4:, :]], axis=1
     )
     return ref_obj_traj, ref_hand_keypoints_traj, ref_hand_keypoints_traj_exclude_pinky
-
-
-def setup_environment(cfg: DictConfig) -> Tuple[object, np.ndarray]:
-    """
-    Initialize the environment and get initial state.
-
-    Args:
-        cfg: Configuration dictionary
-
-    Returns:
-        Tuple containing environment object and initial state
-    """
-    env = make_env(cfg)
-    env.reset()
-    return env
 
 
 def perform_kinematic_retargeting(
@@ -161,6 +146,10 @@ def main(cfg: DictConfig):
 
     # Visualize final trajectory
     visualize_traj_with_meshcat(env.drake_system, x_traj)
+
+    import ipdb
+
+    ipdb.set_trace()
 
 
 if __name__ == "__main__":
