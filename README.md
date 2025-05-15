@@ -11,11 +11,11 @@ expected outcomes include a significant reduction in training
 data requirements compared to traditional methods and more
 realistic policy generation compared to existing approaches.
 
-![Overall Framework](media/vid2skill.drawio.png)
+![Overall Framework](media/vid2skill.drawio.svg)
 
 *Figure 1: Video-to-Skill Framework Overview: We begin by extracting hand and object poses from videos, followed by kinematic motion retargeting to generate kinematically feasible trajectories for the Franka-Allegro system. These trajectories are then refined using trajectory optimization, which incorporates contact and dynamic constraints to ensure dynamic feasibility. Next, we introduce local perturbations to physical parameters, such as the object’s initial state or friction coefficients. For each perturbed setting, we re-solve the trajectory optimization to adapt to the new conditions. After this process, we obtain a diverse set of physically plausible trajectories that can be used as training data for Diffusion Policy.*
 
-![Kinematic Retargeting Trajectory](media/kinematic_retargeting.drawio.png)
+![Kinematic Retargeting Trajectory](media/kinematic_retargeting.drawio.svg)
 
 *Figure 2: Motion tiles illustrating the reference trajectory extracted from the video (top row) and the trajectory produced via kinematic retargeting (bottom row) for the grasping-mustard-bottle task.*
 
