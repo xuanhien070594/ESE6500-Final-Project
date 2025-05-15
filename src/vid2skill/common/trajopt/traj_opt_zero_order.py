@@ -19,9 +19,9 @@ from vid2skill.common.helper_functions.drake_helper_functions import (
 class CEMConfig:
     """Configuration for Cross-Entropy Method."""
 
-    n_samples: int = 50  # Number of samples per iteration
-    n_elite: int = 5  # Number of elite samples to keep
-    n_iterations: int = 200  # Maximum number of iterations
+    n_samples: int = 3200  # Number of samples per iteration
+    n_elite: int = 256  # Number of elite samples to keep
+    n_iterations: int = 100  # Maximum number of iterations
     smoothing_factor: float = 0.5  # Smoothing factor for mean and covariance updates
     initial_std: float = 0.3  # Initial standard deviation for sampling
     convergence_threshold: float = 1e-4  # Threshold for convergence
@@ -295,12 +295,12 @@ class TrajectoryOptimizerCEM(TrajectoryOptimizerBase):
                 del eval_env
                 gc.collect()
 
-            # # Check convergence
-            # if (
-            #     iteration > 0
-            #     and abs(mean_cost - prev_mean_cost) < self.config.convergence_threshold
-            # ):
-            #     break
+            # Check convergence
+            if (
+                iteration > 0
+                and abs(mean_cost - prev_mean_cost) < self.config.convergence_threshold
+            ):
+                break
 
             prev_mean_cost = mean_cost
 
